@@ -1,17 +1,4 @@
----
-title: "ME 317: Statistical Methods in Risk Management at LSE"
-author: Andrea Ranzato;
-date: August 1st, 2019
-output: 
-  github_document:
-     pandoc_args: --webtex
----
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning=FALSE,
-                      fig.align = "center", fig.width=1.41*6, fig.height=1*6, 
-                      fig.margin=TRUE)
-```
-```{r packages}
+## ----packages------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 library(tidyverse)
 library(tidyquant)
 library(lubridate)
@@ -24,8 +11,8 @@ library(scales)
 
 colours <- c("#7cb5ec", "#434348", "#90ed7d", "#f7a35c", "#8085e9", 
              "#f15c80", "#e4d354", "#2b908f", "#f45b5b", "#91e8e1")
-```
-```{r dataraw}
+
+## ----dataraw-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 dataraw <- read_csv("../data/stock-prices.csv") %>% 
   select(-c("PERMNO","VOL")) %>% 
   mutate(DATE = ymd(date),
@@ -38,27 +25,9 @@ dataraw <- read_csv("../data/stock-prices.csv") %>%
     TICKER == "XOM" ~ "Energy",
     TICKER == "MSFT" ~ "IT")) %>% 
   mutate(Sector = factor(Sector))
-```
 
-## Summary
 
-The general purpose of this project is to use techniques learned during the course in *Statistical methods in risk management* useful to analyze stock price data. In particular, we consider prices concerning ten different stocks recorded during the 2007-2009 financial crisis. The data source is the *Wharton Research Data Services*. 
-
-The analysis is structured as follows. In the first section, I show how two extreme events, the rescue of Bear Sterns on March 14, 2008 and Lehman Brothers bankruptcy on September 15, 2008, affected the price and log-return dynamics. Next, I test both the marginal and joint normality of the ten stock returns by means of the *Jarque-Bera* and *Mardia test* respectively. First, we observe that the normal distribution fails to capture returns happening in the tails. Second, joint normality is not detected. Subsequently, I evaluate some pair-wise stock returns, either from companies of the same sector and different ones, in order to quantify their correlation. 
-
-In the second section, I focus on financial stocks with the objective of assessing their dependence using copulas of different types. We see, that the copula which fits the observations best is the t-Copula.
-
-In the third section, I consider a linear portfolio which invest \$1000 in each of the stocks at the beginning of the period, assuming that its composition does not change during the entire period. Afterwards, I evaluate the Value-at-Risk of the portfolio at 95% level using two different strategies. Firstly, I compute the VaR using the empirical profit and loss distribution, secondly using a normal model. The comparison between the two shows that the parametric approach would have led to more conservative capital management decisions compared to empirical one, since it signals higher potential losses. In the end, I add to the analysis 2010 portfolio returns, in order to record the number of violations occurred under the two different frameworks. We see that the normal model incurs in fewer violations with respect to the the historical one.
-
-The last section is devoted to the description of the topics covered during the course. 
-
-## Prices and log returns dynamics
-
-The purpose of this section consists in showing some empirical properties of financial time series using a sample of US assets.
-First of all, I conduct an exploratory analysis of the price dynamics of equities in the Table below between 3 January 2007 and 31 December 2009. 
-As we can see in the Figure below, a strong negative trend plays out in correspondence with Bear Stearns rescue on March 14 2008 and terminates around January 20 2009. Table~\ref{tab:percentagechange} quantifies the percentage price change recorded in that period summarizing the worst downturn of the US financial system since the Great Depression. 
-
-```{r stocks}
+## ----stocks--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 stocks <- tibble(Company = c("American International Group","Amazon.com, Inc.",
                              "Bank of America Corp.","Goldman Sachs Group, Inc.",
                              "Coca-Cola Company","Morgan Stanley",
@@ -70,8 +39,8 @@ stocks <- tibble(Company = c("American International Group","Amazon.com, Inc.",
                  Ticker = c("AIG","AMZN","BA","GS","KO","MS",
                             "MSFT","NTRS","WFC","XOM"))
 kable(stocks, caption = "Table: Equity portfolio composition.",)
-```
-```{r percentage-price-change}
+
+## ----percentage-price-change---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 dataraw %>% 
   filter(DATE %in% c(ymd("2008-03-14"), ymd("2009-01-20"))) %>% 
   pivot_wider(names_from = DATE, values_from = PRC) %>% 
@@ -80,9 +49,9 @@ dataraw %>%
   mutate(DELTA = ((P2-P1)/P1)*100) %>% 
   kable(caption = "Table: Percentage price change between 14 Mar. 2008 and 20 Jan. 2009",
         col.names = c("Ticker", "Sector", "P.2008-03-14", "P.2009-01-20", "(%) Change"))
-```
 
-```{r percentage-price-change-graph}
+
+## ----percentage-price-change-graph---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 dataraw %>% 
   filter(DATE %in% c(ymd("2008-03-14"), ymd("2009-01-20"))) %>% 
   arrange(DATE) %>% 
@@ -97,9 +66,9 @@ dataraw %>%
   labs(y = "Price ($)",
        x = "Days",
        title = "Change in Prices from March 14, 2008 to January 20, 2009") 
-```
 
-```{r price-dynamics}
+
+## ----price-dynamics------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ggplot(dataraw, aes(x = DATE, y = PRC, group = TICKER, colour = TICKER)) + 
   geom_line(size = 0.5) +
   theme_light() +
@@ -118,18 +87,18 @@ ggplot(dataraw, aes(x = DATE, y = PRC, group = TICKER, colour = TICKER)) +
        x = "Date",
        y = "Price") +
   scale_colour_manual(values = colours)
-```
 
-```{r log-returns}
+
+## ----log-returns---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 logReturns <- dataraw %>% 
   select(-Sector) %>% 
   pivot_wider(names_from = TICKER, values_from = PRC) %>% 
   mutate(across(where(is.numeric), ~ log(.x))) %>% 
   mutate(across(where(is.numeric), ~ .x - lag(.x, n = 1))) %>% 
   slice(-1) 
-```
 
-```{r log-returns-graph, fig.width=1.41*6,fig.height=8}
+
+## ----log-returns-graph, fig.width=1.41*6,fig.height=8--------------------------------------------------------------------------------------------------------------------------------------------------------------
 logReturns %>% 
   pivot_longer(cols = !DATE, names_to = "TICKER", values_to = "LOGPRICE") %>% 
   arrange(TICKER) %>% 
@@ -155,9 +124,9 @@ logReturns %>%
        subtitle = "January 03, 2007 - December 31, 2009",
        caption = "Source: Wharton Research Data Services")
 
-```
 
-```{r jarque-bera-test}
+
+## ----jarque-bera-test----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 logReturns %>% 
   pivot_longer(cols = !DATE, names_to = "TICKER", values_to = "PRICE") %>% 
   select(-DATE) %>% 
@@ -172,9 +141,9 @@ logReturns %>%
   kable(caption = "Table: Jarque Bera Test, n. obs. = 756",
         digits = 2,
         format.args = list(big.mark = ".", decimal.mark = ",", scientific = FALSE))
-```
 
-```{r marginal-normality-QQplot, fig.show="hold", results='hide', fig.height=18}
+
+## ----marginal-normality-QQplot, fig.show="hold", results='hide', fig.height=18-------------------------------------------------------------------------------------------------------------------------------------
 logReturnsList <- logReturns  %>% 
   select(!DATE) %>% 
   pivot_longer(cols = everything(), names_to = "TICKER", values_to = "PRC") %>% 
@@ -198,8 +167,8 @@ for (i in seq_along(logReturnsList)) {
 }
 
 gridExtra::grid.arrange(grobs = qqPlots, nrow = 5)
-```
-```{r student-t-test}
+
+## ----student-t-test------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # One-sample Kolmogorov-Smirnov test for student-t distribution
 logReturns %>% 
   select(!DATE) %>% 
@@ -215,9 +184,9 @@ logReturns %>%
         col.names = c("Ticker", "Statistic","p-value", "Alternative", "t-Student"),
         digits = 4,
         format.args = list(big.mark = ".", decimal.mark = ",", scientific = FALSE))
-```
 
-```{r marginal-t-student-QQplot, fig.show="hold", results='hide', fig.height=18}
+
+## ----marginal-t-student-QQplot, fig.show="hold", results='hide', fig.height=18-------------------------------------------------------------------------------------------------------------------------------------
 qqPlots2 <- vector(mode = "list", length = length(logReturnsList))
 for (i in seq_along(logReturnsList)) {
   qqPlots2[[i]] <- ggplot(logReturnsList[[i]], aes(sample = PRC)) +
@@ -229,9 +198,9 @@ for (i in seq_along(logReturnsList)) {
     theme(plot.title = element_text(hjust = 0.5))
 }
 gridExtra::grid.arrange(grobs = qqPlots2, nrow = 5)
-```
 
-```{r log-returns-kurtosis-skewness}
+
+## ----log-returns-kurtosis-skewness---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 dataraw %>% 
   select(-Sector) %>% 
   pivot_wider(names_from = TICKER, values_from = PRC) %>% 
@@ -247,9 +216,9 @@ dataraw %>%
         col.names = c("Skewness", "Kurtosis"),
         digits = 2,
         format.args = list(big.mark = ".", decimal.mark = ",", scientific = FALSE))
-```
 
-```{r multivariate-normality}
+
+## ----multivariate-normality----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 normality_test <- dataraw %>% 
   select(-Sector) %>% 
   pivot_wider(names_from = TICKER, values_from = PRC) %>% 
@@ -264,9 +233,9 @@ normality_test$multivariateNormality %>%
   mutate(Statistic = as.double(levels(Statistic))) %>% 
   kable(caption = "Table: Mardia test for Multivariate Normality.", digits = 3,
         format.args = list(big.mark = ".", decimal.mark = ",", scientific = FALSE))
-```
 
-```{r multivariate-normality-graph}
+
+## ----multivariate-normality-graph----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 normality_test <- dataraw %>% 
   select(-Sector) %>% 
   pivot_wider(names_from = TICKER, values_from = PRC) %>% 
@@ -275,13 +244,9 @@ normality_test <- dataraw %>%
   slice(-1) %>% 
   select(!DATE) %>% 
   MVN::mvn(mvnTest = "mardia", multivariatePlot = "qq")
-```
 
-## Copulas
 
-### Multivariate Copulas
-
-```{r financial-stocks}
+## ----financial-stocks----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 finStocks <- dataraw %>% 
   filter(Sector == "Financial") %>% 
   select(-Sector) %>% 
@@ -291,9 +256,9 @@ finStocks <- dataraw %>%
   slice(-1) %>% 
   select(-DATE) %>% 
   as.matrix()
-```
 
-```{r pseudo-observations, fig.dim=c(10,10)}
+
+## ----pseudo-observations, fig.dim=c(10,10)-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #library(QRM)
 library(copula)
 pseudos <- copula::pobs(finStocks)
@@ -301,39 +266,37 @@ pseudos <- copula::pobs(finStocks)
 # Equivalently to find pseudo-observations
 # as_tibble(finStocks) %>% 
 #   mutate(across(everything(), ~ QRM::edf(.x, adjust = 1)))
-```
 
-```{r fit-multivariate-normal-copula}
+
+## ----fit-multivariate-normal-copula--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 normalCopula <- fitCopula(normalCopula(dim = ncol(finStocks), dispstr = "un"), 
                            data = pseudos, 
                            method = "mpl")
 logLikNormal <- summary(normalCopula)$loglik
-```
 
-```{r fit_multivariate-student-t}
+
+## ----fit_multivariate-student-t------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 tStCopula <- fitCopula(tCopula(dim = ncol(finStocks), dispstr = "un"),
                        data = pseudos,
                        method  = "mpl")
 logLikStudent <- summary(tStCopula)$loglik
-```
 
-```{r fit-multivariate-gumbel}
+
+## ----fit-multivariate-gumbel---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 gumbCompula <- fitCopula(gumbelCopula(dim = ncol(finStocks)), 
                                       data = pseudos,
                          method = "mpl")
 logLikGumbel <- summary(gumbCompula)$loglik
-```
 
-```{r fit-multivariate-clayton}
+
+## ----fit-multivariate-clayton--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 clayCompula <- fitCopula(gumbelCopula(dim = ncol(finStocks)), 
                                       data = pseudos,
                          method = "mpl")
 logLikClayton <- summary(clayCompula)$loglik
-```
 
-### Bivariate Copulas
 
-```{r pairwise-scatter-financials, fig.dim=c(10,10)}
+## ----pairwise-scatter-financials, fig.dim=c(10,10)-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 logReturns %>% 
   select(c("AIG","BA","GS","MS","NTRS","WFC")) %>%
   GGally::ggpairs(lower = list(continuous = GGally::wrap("points", size = 0.1))) +
@@ -347,9 +310,9 @@ logReturns %>%
                                 colour = "black",
                                 hjust = 0.5)) +
   labs(title = "Pair-wise Returns scatter plots of Financial Stocks")
-```
 
-```{r pairwise-financial-mardia-test}
+
+## ----pairwise-financial-mardia-test--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 combs <- t(combn(1:ncol(finStocks), m = 2))
 
 combsName <- c()
@@ -382,13 +345,13 @@ values %>%
                                               scientific = FALSE)))) %>% 
   pull(data) %>% 
   kables()
-```
 
-```{r empirical-scatter-pseudo-observations, fig.dim=c(8,8), fig.cap="Figure (a): Pseudo observations (uniform margins) obtained from actual data, with non parametric estimation of the CDFs."}
+
+## ----empirical-scatter-pseudo-observations, fig.dim=c(8,8), fig.cap="Figure (a): Pseudo observations (uniform margins) obtained from actual data, with non parametric estimation of the CDFs."---------------------
 splom2(pseudos, cex = 0.2, col.mat = "black", pch = 16)
-```
 
-```{r fit-bivariate-t-copula}
+
+## ----fit-bivariate-t-copula----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 bivStudCopula <- vector(mode = "list", length = nrow(combs))
 for (i in 1:nrow(combs)) {
   bivStudCopula[[i]] <- fitCopula(tCopula(dim = 2, dispstr = "un"), 
@@ -396,9 +359,9 @@ for (i in 1:nrow(combs)) {
                                   method = "mpl")
 }
 names(bivStudCopula) <- combsName
-```
 
-```{r multivariate-student-t-simulation, fig.dim=c(8,8), fg.cap="Figure (b): 755 simulated pseudo-observations obtained from a multivariate Student-t distribution with 4 dof and equicorrelation dispersion matrix with rho = 0.7"}
+
+## ----multivariate-student-t-simulation, fig.dim=c(8,8), fg.cap="Figure (b): 755 simulated pseudo-observations obtained from a multivariate Student-t distribution with 4 dof and equicorrelation dispersion matrix with rho = 0.7"----
 nObs <- nrow(finStocks)
 tNVar <- ncol(finStocks)
 cor.par <- 0.7
@@ -425,18 +388,18 @@ QRM::BiDensPlot(func = QRM::dcopula.t, xpts = distribution.limits ,
                 ypts = distribution.limits, df = t.dof, Sigma=Sigma.contour, 
                 type = "persp", npts =15)
 
-```
 
-```{r summary-log-likelihood}
+
+## ----summary-log-likelihood----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 loglikelihoods <- tibble(logLikNormal,logLikStudent,logLikGumbel,logLikClayton)
 kable(loglikelihoods, 
       caption = "Table: MLE results of four different multivariate copula of the Financial stocks",
       digits = 2, 
       format.args = list(big.mark = ".", decimal.mark = ",", scientific = FALSE),
       col.names = c("Normal","Student","Gumbel","Clayton"))
-```
 
-```{r histograms-pseudo-obs, results="hide", fig.height=8, fig.cap="Figure: Pseudo-observations Distribution"}
+
+## ----histograms-pseudo-obs, results="hide", fig.height=8, fig.cap="Figure: Pseudo-observations Distribution"-------------------------------------------------------------------------------------------------------
 finNames <- sort(c("AIG","BA","GS","MS","NTRS","WFC"))
 
 uniHist <- pobs(finStocks) %>% 
@@ -454,9 +417,9 @@ uniHist <- pobs(finStocks) %>%
                         labs(title = str_c("Stock: ", .y)))) %>% 
   pull(plots)
 gridExtra::grid.arrange(grobs = uniHist, ncol = 2)
-```
 
-```{r fit-bivariate-normal}
+
+## ----fit-bivariate-normal------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 bivNormalCopula <- vector(mode="list", length = nrow(combs))
 for (i in 1:nrow(combs)) {
   bivNormalCopula[[i]] <- fitCopula(normalCopula(dim = 2), 
@@ -464,9 +427,9 @@ for (i in 1:nrow(combs)) {
                                     method = "mpl")
 }
 names(bivNormalCopula) <- combsName
-```
 
-```{r fit-bivariate-gumbel}
+
+## ----fit-bivariate-gumbel------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 bivGumbelCopula <- vector(mode = "list", length = nrow(combs))
 for (i in 1:nrow(combs)) {
   bivGumbelCopula[[i]] <- fitCopula(normalCopula(dim = 2), 
@@ -474,21 +437,19 @@ for (i in 1:nrow(combs)) {
                                     method = "mpl")
 }
 names(bivGumbelCopula) <- combsName
-```
 
-```{r fit-bivariate-clayton, eval=FALSE}
-# bivClaytonCopula <- vector(mode = "list", length = nrow(combs))
-# for (i in 1:nrow(combs)) {
-#   bivClaytonCopula[[i]] <- fitCopula(claytonCopula(dim = 2),
-#                                      data = pseudos[,combs[i,]],
-#                                      method = "mpl")
-# }
-# names(bivClaytonCopula) <- combsName
-```
 
-## Portfolio Value-at-Risk
+## ----fit-bivariate-clayton, eval=FALSE-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## # bivClaytonCopula <- vector(mode = "list", length = nrow(combs))
+## # for (i in 1:nrow(combs)) {
+## #   bivClaytonCopula[[i]] <- fitCopula(claytonCopula(dim = 2),
+## #                                      data = pseudos[,combs[i,]],
+## #                                      method = "mpl")
+## # }
+## # names(bivClaytonCopula) <- combsName
 
-```{r portfolio-value}
+
+## ----portfolio-value-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # The value of the portfolio at the beginning of the period is $10.000
 prices <- dataraw %>% 
   select(-Sector) %>% 
@@ -529,8 +490,8 @@ PV %>%
        subtitle = "Inital number of stocks kept fixed for the entire time framework.\nJanuary 03, 2007 - December 31, 2009",
        x = "Date",
        y = "($)")
-```
-```{r portfolio-weights}
+
+## ----portfolio-weights---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Find the weights of each stock at time t by dividinding its values by the 
 # value of the portfolio at time t
 PV <- PV %>% 
@@ -567,9 +528,9 @@ left_join(prices, PV) %>%
        y = "Weight") +
   scale_colour_manual(values = colours)
 
-```
 
-```{r portfolio-profit-loss, fig.height=10}
+
+## ----portfolio-profit-loss, fig.height=10--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 gg1 <- PV %>% 
   mutate(PL = -(V1 - lag(V1, n = 1))) %>% 
   ggplot(aes(x = DATE, y = PL)) +
@@ -616,9 +577,9 @@ gg3 <- PV %>%
 plPlots <- list(gg1, gg2, gg3)
 
 gridExtra::grid.arrange(grobs = plPlots, ncol = 1)
-```
 
-```{r VAR}
+
+## ----VAR-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 PL <- PV %>% 
   mutate(PL = -((V1 - lag(V1, n = 1))/V1)) %>% 
   pull(PL)
@@ -679,9 +640,9 @@ percPL %>%
        subtitle = "January 03, 2007 - December 31, 2009",
        caption = "Source: Wharton Research Data Services",
        x = "p&l")
-```
 
-```{r var-backtesting}
+
+## ----var-backtesting-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Contains the 2010 financial year
 varBacktesting <- read_csv("../data/var-backtesting.csv")
 
@@ -796,4 +757,4 @@ kables(violations)
 violationsPlots <- list(viol1, viol2)
 
 gridExtra::grid.arrange(grobs = violationsPlots, ncol = 1)
-```
+
