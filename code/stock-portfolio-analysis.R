@@ -13,7 +13,7 @@ colours <- c("#7cb5ec", "#434348", "#90ed7d", "#f7a35c", "#8085e9",
              "#f15c80", "#e4d354", "#2b908f", "#f45b5b", "#91e8e1")
 
 ## ----dataraw-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-dataraw <- read_csv("../data/stock-prices.csv") %>% 
+dataraw <- read_csv("data/stock-prices.csv") %>% 
   select(-c("PERMNO","VOL")) %>% 
   mutate(DATE = ymd(date),
          TICKER = factor(TICKER)) %>% 
@@ -27,29 +27,13 @@ dataraw <- read_csv("../data/stock-prices.csv") %>%
   mutate(Sector = factor(Sector))
 
 
-## ----stocks--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-stocks <- tibble(Company = c("American International Group","Amazon.com, Inc.",
-                             "Bank of America Corp.","Goldman Sachs Group, Inc.",
-                             "Coca-Cola Company","Morgan Stanley",
-                             "Microsoft Corp.","Northern Trust Corp.",
-                             "Wells Fargo & Co","ExxonMobil Corp."),
-                 Sector = c("Financials","Consumer","Financials","Financials",
-                            "Consumer","Financials","IT","Financials","Financials",
-                            "Energy"),
-                 Ticker = c("AIG","AMZN","BA","GS","KO","MS",
-                            "MSFT","NTRS","WFC","XOM"))
-kable(stocks, caption = "Table: Equity portfolio composition.",)
-
 ## ----percentage-price-change---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 dataraw %>% 
   filter(DATE %in% c(ymd("2008-03-14"), ymd("2009-01-20"))) %>% 
   pivot_wider(names_from = DATE, values_from = PRC) %>% 
   rename(P2 = "2009-01-20") %>%
   rename(P1 = "2008-03-14") %>%
-  mutate(DELTA = ((P2-P1)/P1)*100) %>% 
-  kable(caption = "Table: Percentage price change between 14 Mar. 2008 and 20 Jan. 2009",
-        col.names = c("Ticker", "Sector", "P.2008-03-14", "P.2009-01-20", "(%) Change"))
-
+  mutate(DELTA = ((P2-P1)/P1)*100)
 
 ## ----percentage-price-change-graph---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 dataraw %>% 
@@ -65,7 +49,8 @@ dataraw %>%
         legend.position = "top") +
   labs(y = "Price ($)",
        x = "Days",
-       title = "Change in Prices from March 14, 2008 to January 20, 2009") 
+       title = "Change in Prices from March 14, 2008 to January 20, 2009",
+       caption = "Source: Wharton Research Data Services") 
 
 
 ## ----price-dynamics------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -137,11 +122,7 @@ logReturns %>%
   unnest(ts) %>% 
   mutate(Normal = "No") %>% 
   select(-c(parameter,method)) %>% 
-  arrange(statistic) %>% 
-  kable(caption = "Table: Jarque Bera Test, n. obs. = 756",
-        digits = 2,
-        format.args = list(big.mark = ".", decimal.mark = ",", scientific = FALSE))
-
+  arrange(statistic)
 
 ## ----marginal-normality-QQplot, fig.show="hold", results='hide', fig.height=18-------------------------------------------------------------------------------------------------------------------------------------
 logReturnsList <- logReturns  %>% 
@@ -179,11 +160,7 @@ logReturns %>%
   unnest(value) %>% 
   select(-method) %>% 
   arrange(statistic) %>% 
-  mutate(t.Student = rep("NO", 10)) %>% 
-  kable(caption = "Table: One-sample Kolmogorov-Smirnov test for student-t distribution, n. obs. = 756, dgf. = 10",
-        col.names = c("Ticker", "Statistic","p-value", "Alternative", "t-Student"),
-        digits = 4,
-        format.args = list(big.mark = ".", decimal.mark = ",", scientific = FALSE))
+  mutate(t.Student = rep("NO", 10))
 
 
 ## ----marginal-t-student-QQplot, fig.show="hold", results='hide', fig.height=18-------------------------------------------------------------------------------------------------------------------------------------
@@ -211,11 +188,7 @@ dataraw %>%
   MVN::mvn(mvnTest = "mardia") %>% 
   pluck(3) %>% 
   select(Skew, Kurtosis) %>% 
-  arrange(Kurtosis) %>% 
-  kable(caption = "Table: Log Returns Skewness and Kurtosis, n. obs. = 756",
-        col.names = c("Skewness", "Kurtosis"),
-        digits = 2,
-        format.args = list(big.mark = ".", decimal.mark = ",", scientific = FALSE))
+  arrange(Kurtosis)
 
 
 ## ----multivariate-normality----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -230,9 +203,7 @@ normality_test <- dataraw %>%
 
 normality_test$multivariateNormality %>% 
   slice(1:2) %>% 
-  mutate(Statistic = as.double(levels(Statistic))) %>% 
-  kable(caption = "Table: Mardia test for Multivariate Normality.", digits = 3,
-        format.args = list(big.mark = ".", decimal.mark = ",", scientific = FALSE))
+  mutate(Statistic = as.double(levels(Statistic))) 
 
 
 ## ----multivariate-normality-graph----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -488,6 +459,7 @@ PV %>%
              size = 0.5, linetype = 2) +
   labs(title = "Portfolio value",
        subtitle = "Inital number of stocks kept fixed for the entire time framework.\nJanuary 03, 2007 - December 31, 2009",
+       caption = "Source: Wharton Research Data Services",
        x = "Date",
        y = "($)")
 
@@ -599,11 +571,6 @@ varGauss <- qnorm(0.95)*sdPL - meanPL
 names(varGauss) <- "95%"
 varHistorical <- quantile(PL, p = 0.95, na.rm = TRUE)
 
-kable(matrix(c(varGauss,varHistorical), ncol=2), 
-      col.names = c("Gaussian VaR", "Historical VaR"),
-      digits = 4, 
-      format.args = list(big.mark = ".", decimal.mark = ",", scientific = FALSE),
-      caption = "95% Value-at-Risk calculated on 31 December 209 for a one-day horizon under parametric and non-parametric appproach.")
 
 percPL <- PV %>% 
   mutate(percPL = -((V1 - lag(V1, n = 1))/V1)) %>% 
@@ -644,7 +611,7 @@ percPL %>%
 
 ## ----var-backtesting-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Contains the 2010 financial year
-varBacktesting <- read_csv("../data/var-backtesting.csv")
+varBacktesting <- read_csv("data/var-backtesting.csv")
 
 entireSerie <- bind_rows(dataraw, varBacktesting) %>% 
   select(-Sector) %>% 
@@ -747,12 +714,6 @@ viol2 <- rollHist %>%
        caption = "Source: Wharton Research Data Services",
        x = "Date",
        y = "p&l")
-
-violations <- list(numberViolationG, numberViolationH) %>% 
-  map2(c("Gaussian VaR", "Historical VaR"),
-       ~ kable(.x, 
-               caption = str_c("Number violations for 2010 returns under ", .y)))
-kables(violations)
 
 violationsPlots <- list(viol1, viol2)
 

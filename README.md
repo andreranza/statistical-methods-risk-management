@@ -51,8 +51,8 @@ of all, I conduct an exploratory analysis of the price dynamics of
 equities in the Table below between 3 January 2007 and 31 December 2009.
 As we can see in the Figure below, a strong negative trend plays out in
 correspondence with Bear Stearns rescue on March 14 2008 and terminates
-around January 20 2009. Table\~ quantifies the percentage price change
-recorded in that period summarizing the worst downturn of the US
+around January 20 2009. The Table below, quantifies the percentage price
+change recorded in that period summarizing the worst downturn of the US
 financial system since the Great Depression.
 
 | Company                      | Sector     | Ticker |
@@ -85,11 +85,84 @@ Table: Equity portfolio composition.
 
 Table: Percentage price change between 14 Mar. 2008 and 20 Jan. 2009
 
-<img src="code/stock-portfolio-analysis_files/figure-gfm/percentage-price-change-graph-1.png" style="display: block; margin: auto;" />
+<img src="stock-portfolio-analysis_files/figure-gfm/percentage-price-change-graph-1.png" style="display: block; margin: auto;" />
 
-<img src="code/stock-portfolio-analysis_files/figure-gfm/price-dynamics-1.png" style="display: block; margin: auto;" />
+<img src="stock-portfolio-analysis_files/figure-gfm/price-dynamics-1.png" style="display: block; margin: auto;" />
 
-<img src="code/stock-portfolio-analysis_files/figure-gfm/log-returns-graph-1.png" style="display: block; margin: auto;" />
+Then, I consider the log returns illustrated in the Figure below where
+we can realize the presence of the following *stylized facts*, as
+reported in Embrechts, McNeil, and Frey (2015). (1) conditional expected
+returns are close to zero; (2) volatility appears to vary over; (3)
+extreme returns appear in clusters. In particular, within our context,
+higher volatility is registered afterwards the bankruptcy of Lehman
+Brothers highlighted in red.
+
+We model log-returns instead of plain prices, in order to accommodate
+the assumptions underlying the lognormal model, namely that, following
+the formulation of Ruppert (2006), ![r\_{1} = log(1 + R\_{1}),\\ r\_{2}
+= log(1 + R\_{2}), \\ldots,\\ r\_{n} = log(1 +
+R\_{n})](https://latex.codecogs.com/png.latex?r_%7B1%7D%20%3D%20log%281%20%2B%20R_%7B1%7D%29%2C%5C%20r_%7B2%7D%20%3D%20log%281%20%2B%20R_%7B2%7D%29%2C%20%5Cldots%2C%5C%20r_%7Bn%7D%20%3D%20log%281%20%2B%20R_%7Bn%7D%29
+"r_{1} = log(1 + R_{1}),\\ r_{2} = log(1 + R_{2}), \\ldots,\\ r_{n} = log(1 + R_{n})")
+are i.i.d.
+![N(\\mu,\\sigma^{2})](https://latex.codecogs.com/png.latex?N%28%5Cmu%2C%5Csigma%5E%7B2%7D%29
+"N(\\mu,\\sigma^{2})"), where ![1 + {R}\_{t} =
+\\frac{{P}\_{t}}{{P}\_{t-1}}](https://latex.codecogs.com/png.latex?1%20%2B%20%7BR%7D_%7Bt%7D%20%3D%20%5Cfrac%7B%7BP%7D_%7Bt%7D%7D%7B%7BP%7D_%7Bt-1%7D%7D
+"1 + {R}_{t} = \\frac{{P}_{t}}{{P}_{t-1}}"), for
+![t=1,\\ldots,n](https://latex.codecogs.com/png.latex?t%3D1%2C%5Cldots%2Cn
+"t=1,\\ldots,n").
+
+Using this model allows easier computations of multiperiod returns since
+
+  
+![ &#10;1+R\_{t}(k) = (1 + {R}\_{t}) \\cdots (1 +
+{R}\_{t-k+1})\\\\&#10;= exp(r\_{t}) \\cdots exp(r\_{t-k+1})\\\\&#10;=
+exp(r\_{t} + \\ldots +
+r\_{t-k+1})&#10;](https://latex.codecogs.com/png.latex?%20%0A1%2BR_%7Bt%7D%28k%29%20%20%3D%20%281%20%2B%20%7BR%7D_%7Bt%7D%29%20%5Ccdots%20%281%20%2B%20%7BR%7D_%7Bt-k%2B1%7D%29%5C%5C%0A%3D%20%20exp%28r_%7Bt%7D%29%20%5Ccdots%20exp%28r_%7Bt-k%2B1%7D%29%5C%5C%0A%3D%20%20exp%28r_%7Bt%7D%20%2B%20%5Cldots%20%2B%20r_%7Bt-k%2B1%7D%29%0A
+" 
+1+R_{t}(k)  = (1 + {R}_{t}) \\cdots (1 + {R}_{t-k+1})\\\\
+=  exp(r_{t}) \\cdots exp(r_{t-k+1})\\\\
+=  exp(r_{t} + \\ldots + r_{t-k+1})
+")  
+where
+![1+R\_{t}(k)](https://latex.codecogs.com/png.latex?1%2BR_%7Bt%7D%28k%29
+"1+R_{t}(k)") indicates the gross return over the most recent k periods.
+
+As a result,
+
+  
+![log(1+ R\_{t}(k))=r\_{t} + \\cdots +
+r\_{t-k+1}](https://latex.codecogs.com/png.latex?log%281%2B%20R_%7Bt%7D%28k%29%29%3Dr_%7Bt%7D%20%2B%20%5Ccdots%20%2B%20r_%7Bt-k%2B1%7D
+"log(1+ R_{t}(k))=r_{t} + \\cdots + r_{t-k+1}")  
+
+Hence, since each
+![r\_{t}](https://latex.codecogs.com/png.latex?r_%7Bt%7D "r_{t}") is
+normal, their sum is normal too.
+
+Moreover, log returns represent a close approximation of the net returns
+![\\frac{P\_{t}-P\_{t-1}}{P\_{t}}](https://latex.codecogs.com/png.latex?%5Cfrac%7BP_%7Bt%7D-P_%7Bt-1%7D%7D%7BP_%7Bt%7D%7D
+"\\frac{P_{t}-P_{t-1}}{P_{t}}"), unless ![1 +
+{R}\_{t}](https://latex.codecogs.com/png.latex?1%20%2B%20%7BR%7D_%7Bt%7D
+"1 + {R}_{t}") is small.
+
+<img src="stock-portfolio-analysis_files/figure-gfm/log-returns-graph-1.png" style="display: block; margin: auto;" />
+
+The exploratory analysis follows by testing both marginal and *joint*
+normality of the log returns. First, the nonnnormality of the marginal
+distribution is assessed by looking at the *QQ Plots* which compares
+theoretical quantiles one would observe in case of normality, with those
+of the actual sample observations. In all cases, we observe that the
+normal model provide a faithful description of the returns only with
+respect to observations close to mean. Instead, observations far away
+from the mean, the so-called *tails*, are under-represented since the
+normal model does not set enough probability mass on observations away
+![2\\sigma](https://latex.codecogs.com/png.latex?2%5Csigma "2\\sigma")
+from the mean. The results from *Jarque-Bera* test in the Table below
+aids the naked eye to confirm the initial beliefs by rejecting the null
+hypothesis of normality. In addition, I provide the Skewness and
+Kurtosis Measurements to reinforce the idea that the marginal empirical
+distributions are not normal. In general, distributions with higher
+kurtosis and *fat-tails* might provide a better representation of the
+returns.
 
 | TICKER |    statistic | p.value | Normal |
 | :----- | -----------: | ------: | :----- |
@@ -106,7 +179,7 @@ Table: Percentage price change between 14 Mar. 2008 and 20 Jan. 2009
 
 Table: Jarque Bera Test, n. obs. = 756
 
-<img src="code/stock-portfolio-analysis_files/figure-gfm/marginal-normality-QQplot-1.png" style="display: block; margin: auto;" />
+<img src="stock-portfolio-analysis_files/figure-gfm/marginal-normality-QQplot-1.png" style="display: block; margin: auto;" />
 
 | Ticker | Statistic | p-value | Alternative | t-Student |
 | :----- | --------: | ------: | :---------- | :-------- |
@@ -124,7 +197,10 @@ Table: Jarque Bera Test, n. obs. = 756
 Table: One-sample Kolmogorov-Smirnov test for student-t distribution,
 n. obs. = 756, dgf. = 10
 
-<img src="code/stock-portfolio-analysis_files/figure-gfm/marginal-t-student-QQplot-1.png" style="display: block; margin: auto;" />
+<img src="stock-portfolio-analysis_files/figure-gfm/marginal-t-student-QQplot-1.png" style="display: block; margin: auto;" />
+
+From a practical point of view, these results questions the reliability
+of the Normal Value-at-Risk model to identify extreme negative returns.
 
 <table>
 
@@ -384,6 +460,17 @@ AIG
 
 </table>
 
+Since most of the times the interest is devoted in understanding the
+behaviour of returns considered simultaneously rather than individually,
+we test also the normality of the ten-dimensional random vector
+![X=(X\_{AMZN},
+X\_{AIG},\\ldots,X\_{WFC})](https://latex.codecogs.com/png.latex?X%3D%28X_%7BAMZN%7D%2C%20X_%7BAIG%7D%2C%5Cldots%2CX_%7BWFC%7D%29
+"X=(X_{AMZN}, X_{AIG},\\ldots,X_{WFC})"). The test chosen to assess
+multivariate joint normality is the *Mardia test* which compares
+multivariate measures of skewness and kurtosis on the basis of the
+*Mahalanobis distance*. The results in the Table and Figure below
+suggest strong evidence against the non-normality hypothesis.
+
 <table>
 
 <caption>
@@ -486,15 +573,162 @@ NO
 
 </table>
 
-<img src="code/stock-portfolio-analysis_files/figure-gfm/multivariate-normality-graph-1.png" style="display: block; margin: auto;" />
+<img src="stock-portfolio-analysis_files/figure-gfm/multivariate-normality-graph-1.png" style="display: block; margin: auto;" />
+
+In this section, we have become aware that risk models based on the
+normal distribution are not satisfactory since they might underestimate
+the risk of suffering large losses. Embrechts, McNeil, and Frey (2015)
+summarizes the following pitfalls:
+
+  - The tails of its univariate marginal distributions are too thin;
+    they do not assign enough weight to *extreme* events.
+
+  - The joint tails of the distribution do not assign enough weight to
+    *joint extreme* outcomes.
+
+  - The distribution has a strong form of symmetry, known as elliptical
+    asymmetry.
 
 ## Copulas
 
-### Multivariate Copulas
+In this section, I begin with considering pair-wise returns of stocks
+belonging to the financial sector, in order to investigate their
+dependence structure. The Figure below represent the empirical marginal
+distribution, as well as pairs of scatterplots between returns. In
+addition, the upper off-diagonal quadrants provides a measure of linear
+correlation between stocks. We can see that there exists a decent amount
+of linear correlation between pairs stocks. However, we know that this
+measure is reliable only when the underlying data generating mechanism
+is ascribable to an elliptical distribution such as the multivariate
+Normal. For this reason, we assess visually if the data presents the
+features of elliptical distributions. Instead, we spot within our data:
+(1) the presence of deviations from ellipsoids of constant density; (2)
+some *long tails*, especially between GS and MS; (3) potential presence
+of non linear behaviours; (4) high kurtosis of the marginals. These
+feelings are confirmed by the Mardia test on all the combinations of
+financials stocks which confirms that bivariate distributions between
+stocks are not Normal.
 
-### Bivariate Copulas
+As a consequence, the Pearson correlation coefficient is a good measure
+of association, only when the returns have an elliptical distribution,
+because it does not takes into account non linearities which might be
+well present in empirical data. If this is not the case, we should rely
+on concordance measure such as the *Spearman’s rank correlation* and
+*Kendall’s Tau*. For example, given two bivariate distributions, one
+with stronger lower tail dependence than the other, it might happen that
+the correlation coefficient is the same, even if one of the two should
+be perceived as more riskier than the other. Hence, once again, assuming
+i.i.d. returns from elliptical distributions in the construction of risk
+models, and relying on their measure of linear correlation, might not
+represent a reliable representation of the phenomenon. For this reason,
+we need risk measures able to provide a description of the returns which
+go beyond the description “when the returns of stock A fall, returns of
+stock B fall too”. Having statistical tools able to account for these
+behaviours is relevant for risk management purposes.
 
-<img src="code/stock-portfolio-analysis_files/figure-gfm/pairwise-scatter-financials-1.png" style="display: block; margin: auto;" />
+Copulas are joint distributions defined on the hyper-unit cube with the
+following characteristics:
+
+  - Provide way of isolating the description of the dependence
+    structure.
+  - Express dependence on a *quantile scale*.
+  - Facilitate a bottom-up approach to multivariate model building.
+
+As any other joint distributions copulas have density function and
+cumulative distribution function. Generally speaking, copulas are fitted
+to the data as follows: firstly, the so called margins (i.e. the stand
+alone marginal distributions) are specified, namely they are known
+distributions. If this is the case, we proceed by estimating the
+parameters of interest from empirical data using MLE. Then, we apply the
+corresponding probability integral transform to each margin to obtain
+Uniforms margins. This is possible since the parameters and the inverse
+function are known. Finally, we estimate the copula density with MLE.
+
+However, in practice, the margins are unknown. As a consequence, the
+margins are estimated non-parametrically, by means of the empirical
+distribution function. This is done in order to recover a sample of
+*pseudo-observations* with uniform distributed margins where the copulas
+densities are fitted. The table below reports the output of the maximum
+likelihood regarding four different types of multivariate copulas fitted
+on the financials stocks. Student-t coupla fits the data better compared
+to the others.
+
+<table>
+
+<caption>
+
+Table: MLE results of four different multivariate copula of the
+Financial stocks
+
+</caption>
+
+<thead>
+
+<tr>
+
+<th style="text-align:right;">
+
+Normal
+
+</th>
+
+<th style="text-align:right;">
+
+Student
+
+</th>
+
+<th style="text-align:right;">
+
+Gumbel
+
+</th>
+
+<th style="text-align:right;">
+
+Clayton
+
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td style="text-align:right;">
+
+1.256,09
+
+</td>
+
+<td style="text-align:right;">
+
+1.667,14
+
+</td>
+
+<td style="text-align:right;">
+
+944,6
+
+</td>
+
+<td style="text-align:right;">
+
+944,6
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+<img src="stock-portfolio-analysis_files/figure-gfm/pairwise-scatter-financials-1.png" style="display: block; margin: auto;" />
 
 <table class="kable_wrapper">
 
@@ -2098,9 +2332,12 @@ NO
 
 </table>
 
+Then, we consider bivariate pseudo-observations arising from both actual
+data and simulated ones.
+
 <div class="figure" style="text-align: center">
 
-<img src="code/stock-portfolio-analysis_files/figure-gfm/empirical-scatter-pseudo-observations-1.png" alt="Figure (a): Pseudo observations (uniform margins) obtained from actual data, with non parametric estimation of the CDFs."  />
+<img src="stock-portfolio-analysis_files/figure-gfm/empirical-scatter-pseudo-observations-1.png" alt="Figure (a): Pseudo observations (uniform margins) obtained from actual data, with non parametric estimation of the CDFs."  />
 
 <p class="caption">
 
@@ -2111,86 +2348,11 @@ data, with non parametric estimation of the CDFs.
 
 </div>
 
-<img src="code/stock-portfolio-analysis_files/figure-gfm/multivariate-student-t-simulation-1.png" style="display: block; margin: auto;" /><img src="code/stock-portfolio-analysis_files/figure-gfm/multivariate-student-t-simulation-2.png" style="display: block; margin: auto;" />
-
-<table>
-
-<caption>
-
-Table: MLE results of four different multivariate copula of the
-Financial stocks
-
-</caption>
-
-<thead>
-
-<tr>
-
-<th style="text-align:right;">
-
-Normal
-
-</th>
-
-<th style="text-align:right;">
-
-Student
-
-</th>
-
-<th style="text-align:right;">
-
-Gumbel
-
-</th>
-
-<th style="text-align:right;">
-
-Clayton
-
-</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-<tr>
-
-<td style="text-align:right;">
-
-1.256,09
-
-</td>
-
-<td style="text-align:right;">
-
-1.667,14
-
-</td>
-
-<td style="text-align:right;">
-
-944,6
-
-</td>
-
-<td style="text-align:right;">
-
-944,6
-
-</td>
-
-</tr>
-
-</tbody>
-
-</table>
+<img src="stock-portfolio-analysis_files/figure-gfm/multivariate-student-t-simulation-1.png" style="display: block; margin: auto;" /><img src="stock-portfolio-analysis_files/figure-gfm/multivariate-student-t-simulation-2.png" style="display: block; margin: auto;" />
 
 <div class="figure" style="text-align: center">
 
-<img src="code/stock-portfolio-analysis_files/figure-gfm/histograms-pseudo-obs-1.png" alt="Figure: Pseudo-observations Distribution"  />
+<img src="stock-portfolio-analysis_files/figure-gfm/histograms-pseudo-obs-1.png" alt="Figure: Pseudo-observations Distribution"  />
 
 <p class="caption">
 
@@ -2202,10 +2364,69 @@ Figure: Pseudo-observations Distribution
 
 ## Portfolio Value-at-Risk
 
-<img src="code/stock-portfolio-analysis_files/figure-gfm/portfolio-value-1.png" style="display: block; margin: auto;" />
-<img src="code/stock-portfolio-analysis_files/figure-gfm/portfolio-weights-1.png" style="display: block; margin: auto;" />
+In this section we consider a linear portfolio which allocates $1000 on
+each of the ten assets at the beginning of the period. We denote
+![(n\_{1}, n\_{2}, \\ldots,
+n\_{k})](https://latex.codecogs.com/png.latex?%28n_%7B1%7D%2C%20n_%7B2%7D%2C%20%5Cldots%2C%20n_%7Bk%7D%29
+"(n_{1}, n_{2}, \\ldots, n_{k})") the vector of portfolio holdings at
+the beginning of the period where *n* stands for units of asset *i*
+bought at ![t=0](https://latex.codecogs.com/png.latex?t%3D0 "t=0"). We
+assume that the holdings (units) remain constant over the entire period.
+The following Equation represent the value of the portfolio at any time
+time t which is the sum of each asset.   
+![&#10;P\_{t} = \\sum\_{i=1}^{k}
+{n\_{i}}{p\_{it}}&#10;](https://latex.codecogs.com/png.latex?%0AP_%7Bt%7D%20%3D%20%5Csum_%7Bi%3D1%7D%5E%7Bk%7D%20%7Bn_%7Bi%7D%7D%7Bp_%7Bit%7D%7D%0A
+"
+P_{t} = \\sum_{i=1}^{k} {n_{i}}{p_{it}}
+")  
+The portfolio weights on asset *i* are   
+![&#10;w\_{it} = \\frac{{n}\_{i}{p}\_{it}}{P\_{t}}
+&#10;](https://latex.codecogs.com/png.latex?%0Aw_%7Bit%7D%20%3D%20%5Cfrac%7B%7Bn%7D_%7Bi%7D%7Bp%7D_%7Bit%7D%7D%7BP_%7Bt%7D%7D%20%0A
+"
+w_{it} = \\frac{{n}_{i}{p}_{it}}{P_{t}} 
+")  
+When each ![n\_{k}](https://latex.codecogs.com/png.latex?n_%7Bk%7D
+"n_{k}") remain constant over time, then the portfolio weights changes
+over time.
 
-<img src="code/stock-portfolio-analysis_files/figure-gfm/portfolio-profit-loss-1.png" style="display: block; margin: auto;" />
+Once, we have the value of the portfolio at each time period the *profit
+and loss* gives the change in value of the portfolio between two
+consecutive times   
+![{\\Delta}{P}\_{t} = P\_{t} -
+P\_{t-1}](https://latex.codecogs.com/png.latex?%7B%5CDelta%7D%7BP%7D_%7Bt%7D%20%3D%20P_%7Bt%7D%20-%20P_%7Bt-1%7D
+"{\\Delta}{P}_{t} = P_{t} - P_{t-1}")  
+<img src="stock-portfolio-analysis_files/figure-gfm/portfolio-value-1.png" style="display: block; margin: auto;" />
+<img src="stock-portfolio-analysis_files/figure-gfm/portfolio-weights-1.png" style="display: block; margin: auto;" />
+
+The box plot in the Figure below displays the historical distribution of
+the losses obtained until 31 December 2009. Overall, assuming expected
+returns equal to zero, seems to be a reasonable assumption.
+
+The next step consists in computing the 95% Value-at-Risk for the
+portfolio, over a risk horizon of one day.
+
+Two strategies are adopted. Firstly, we assume that the percentage
+returns of the portfolio are i.i.d. normally distributed. The resulting
+VaR is expressed as a percentage of the portfolio’s current value, since
+it is estimated from the portfolio return distribution. Secondly, I
+adopt a non-parametric approach based on the 95-th quantile of the
+empirical cdf. In this case, the advantage of adopting such approach
+relies on the fact that no assumption are made on the functional form of
+the model which generates the data. On the other hand, we are implicitly
+assuming that empirical cdf estimated from past returns will be
+representative for the returns one day ahead from now. Needless to say,
+this assumption might not be correct. The difference between the two
+approaches is illustrated in the following Figures.
+
+<img src="stock-portfolio-analysis_files/figure-gfm/portfolio-profit-loss-1.png" style="display: block; margin: auto;" />
+
+The VaR results should be interpreted as follows: (1) under the
+parametric normal VaR, we expect to incur in a loss of more than $417.05
+with probability 5%, over a one-day horizon; (2) under the historical
+VaR, we expect to incur in a loss of more than $344.05 with probability
+5%, over a one-day horizon. Hence, the parametric approach leads to more
+cautious decisions in terms of capital management, because it signals
+higher potential losses compared to the historical one.
 
 <table>
 
@@ -2258,7 +2479,27 @@ Historical VaR
 
 </table>
 
-<img src="code/stock-portfolio-analysis_files/figure-gfm/VAR-1.png" style="display: block; margin: auto;" />
+<img src="stock-portfolio-analysis_files/figure-gfm/VAR-1.png" style="display: block; margin: auto;" />
+
+The last step of the VaR analysis consists in testing the two models on
+portfolio returns of 2010 using a rolling window of 755 days. The first
+step of the test compares the VaR forecast made on 31 December 2009,
+with the realized loss/return obtained on 2 January 2010. In other
+words, the realized loss/return on
+![t+1](https://latex.codecogs.com/png.latex?t%2B1 "t+1") is compared
+with the VaR predicted for that day in
+![t](https://latex.codecogs.com/png.latex?t "t"). If the loss is higher
+than the threshold signaled by the VaR, then a *violation* is recorded.
+The procedure proceeds by shifting the estimation window ahead by one
+day until exhaustion. In the end, we find that both the historical and
+parametric VaR are almost constant during the period. This might be a
+pitfall of this metric since it might not be flexible enough to changing
+condition, especially in presence of higher volatility. The Figure below
+shows in red the daily VaR and in black the actual loss/return. When the
+red line intersects the black one we record a violation where the VaR
+fails to predict the actual loss. Notice that losses are indicated as
+positive quantities. In conclusion, Table below summarizes the number of
+violations.
 
 <table class="kable_wrapper">
 
@@ -2412,4 +2653,22 @@ YES
 
 </table>
 
-<img src="code/stock-portfolio-analysis_files/figure-gfm/var-backtesting-1.png" style="display: block; margin: auto;" />
+<img src="stock-portfolio-analysis_files/figure-gfm/var-backtesting-1.png" style="display: block; margin: auto;" />
+
+<div id="refs" class="references">
+
+<div id="ref-embrechts">
+
+Embrechts, Paul, Alexander J. McNeil, and Rudiger Frey. 2015.
+*Quantitative Risk Management: Concepts, Techniques and Tools*. Second.
+Market Risk Analysis. Princeton University Press.
+
+</div>
+
+<div id="ref-ruppert">
+
+Ruppert, David. 2006. *Statistics and Finance*. Second. Springer.
+
+</div>
+
+</div>
