@@ -85,9 +85,9 @@ Table: Equity portfolio composition.
 
 Table: Percentage price change between 14 Mar. 2008 and 20 Jan. 2009
 
-<img src="stock-portfolio-analysis_files/figure-gfm/percentage-price-change-graph-1.png" style="display: block; margin: auto;" />
+<img src="code/stock-portfolio-analysis_files/figure-gfm/percentage-price-change-graph-1.png" style="display: block; margin: auto;" />
 
-<img src="stock-portfolio-analysis_files/figure-gfm/price-dynamics-1.png" style="display: block; margin: auto;" />
+<img src="code/stock-portfolio-analysis_files/figure-gfm/price-dynamics-1.png" style="display: block; margin: auto;" />
 
 Then, I consider the log returns illustrated in the Figure below where
 we can realize the presence of the following *stylized facts*, as
@@ -144,7 +144,7 @@ Moreover, log returns represent a close approximation of the net returns
 {R}\_{t}](https://latex.codecogs.com/png.latex?1%20%2B%20%7BR%7D_%7Bt%7D
 "1 + {R}_{t}") is small.
 
-<img src="stock-portfolio-analysis_files/figure-gfm/log-returns-graph-1.png" style="display: block; margin: auto;" />
+<img src="code/stock-portfolio-analysis_files/figure-gfm/log-returns-graph-1.png" style="display: block; margin: auto;" />
 
 The exploratory analysis follows by testing both marginal and *joint*
 normality of the log returns. First, the nonnnormality of the marginal
@@ -179,7 +179,7 @@ returns.
 
 Table: Jarque Bera Test, n. obs. = 756
 
-<img src="stock-portfolio-analysis_files/figure-gfm/marginal-normality-QQplot-1.png" style="display: block; margin: auto;" />
+<img src="code/stock-portfolio-analysis_files/figure-gfm/marginal-normality-QQplot-1.png" style="display: block; margin: auto;" />
 
 | Ticker | Statistic | p-value | Alternative | t-Student |
 | :----- | --------: | ------: | :---------- | :-------- |
@@ -197,7 +197,7 @@ Table: Jarque Bera Test, n. obs. = 756
 Table: One-sample Kolmogorov-Smirnov test for student-t distribution,
 n. obs. = 756, dgf. = 10
 
-<img src="stock-portfolio-analysis_files/figure-gfm/marginal-t-student-QQplot-1.png" style="display: block; margin: auto;" />
+<img src="code/stock-portfolio-analysis_files/figure-gfm/marginal-t-student-QQplot-1.png" style="display: block; margin: auto;" />
 
 From a practical point of view, these results questions the reliability
 of the Normal Value-at-Risk model to identify extreme negative returns.
@@ -573,7 +573,7 @@ NO
 
 </table>
 
-<img src="stock-portfolio-analysis_files/figure-gfm/multivariate-normality-graph-1.png" style="display: block; margin: auto;" />
+<img src="code/stock-portfolio-analysis_files/figure-gfm/multivariate-normality-graph-1.png" style="display: block; margin: auto;" />
 
 In this section, we have become aware that risk models based on the
 normal distribution are not satisfactory since they might underestimate
@@ -728,7 +728,7 @@ Clayton
 
 </table>
 
-<img src="stock-portfolio-analysis_files/figure-gfm/pairwise-scatter-financials-1.png" style="display: block; margin: auto;" />
+<img src="code/stock-portfolio-analysis_files/figure-gfm/pairwise-scatter-financials-1.png" style="display: block; margin: auto;" />
 
 <table class="kable_wrapper">
 
@@ -2337,7 +2337,7 @@ data and simulated ones.
 
 <div class="figure" style="text-align: center">
 
-<img src="stock-portfolio-analysis_files/figure-gfm/empirical-scatter-pseudo-observations-1.png" alt="Figure (a): Pseudo observations (uniform margins) obtained from actual data, with non parametric estimation of the CDFs."  />
+<img src="code/stock-portfolio-analysis_files/figure-gfm/empirical-scatter-pseudo-observations-1.png" alt="Figure (a): Pseudo observations (uniform margins) obtained from actual data, with non parametric estimation of the CDFs."  />
 
 <p class="caption">
 
@@ -2348,11 +2348,11 @@ data, with non parametric estimation of the CDFs.
 
 </div>
 
-<img src="stock-portfolio-analysis_files/figure-gfm/multivariate-student-t-simulation-1.png" style="display: block; margin: auto;" /><img src="stock-portfolio-analysis_files/figure-gfm/multivariate-student-t-simulation-2.png" style="display: block; margin: auto;" />
+<img src="code/stock-portfolio-analysis_files/figure-gfm/multivariate-student-t-simulation-1.png" style="display: block; margin: auto;" /><img src="code/stock-portfolio-analysis_files/figure-gfm/multivariate-student-t-simulation-2.png" style="display: block; margin: auto;" />
 
 <div class="figure" style="text-align: center">
 
-<img src="stock-portfolio-analysis_files/figure-gfm/histograms-pseudo-obs-1.png" alt="Figure: Pseudo-observations Distribution"  />
+<img src="code/stock-portfolio-analysis_files/figure-gfm/histograms-pseudo-obs-1.png" alt="Figure: Pseudo-observations Distribution"  />
 
 <p class="caption">
 
@@ -2395,8 +2395,8 @@ consecutive times
 ![{\\Delta}{P}\_{t} = P\_{t} -
 P\_{t-1}](https://latex.codecogs.com/png.latex?%7B%5CDelta%7D%7BP%7D_%7Bt%7D%20%3D%20P_%7Bt%7D%20-%20P_%7Bt-1%7D
 "{\\Delta}{P}_{t} = P_{t} - P_{t-1}")  
-<img src="stock-portfolio-analysis_files/figure-gfm/portfolio-value-1.png" style="display: block; margin: auto;" />
-<img src="stock-portfolio-analysis_files/figure-gfm/portfolio-weights-1.png" style="display: block; margin: auto;" />
+<img src="code/stock-portfolio-analysis_files/figure-gfm/portfolio-value-1.png" style="display: block; margin: auto;" />
+<img src="code/stock-portfolio-analysis_files/figure-gfm/portfolio-weights-1.png" style="display: block; margin: auto;" />
 
 The box plot in the Figure below displays the historical distribution of
 the losses obtained until 31 December 2009. Overall, assuming expected
@@ -2418,7 +2418,7 @@ representative for the returns one day ahead from now. Needless to say,
 this assumption might not be correct. The difference between the two
 approaches is illustrated in the following Figures.
 
-<img src="stock-portfolio-analysis_files/figure-gfm/portfolio-profit-loss-1.png" style="display: block; margin: auto;" />
+<img src="code/stock-portfolio-analysis_files/figure-gfm/portfolio-profit-loss-1.png" style="display: block; margin: auto;" />
 
 The VaR results should be interpreted as follows: (1) under the
 parametric normal VaR, we expect to incur in a loss of more than $417.05
@@ -2479,7 +2479,7 @@ Historical VaR
 
 </table>
 
-<img src="stock-portfolio-analysis_files/figure-gfm/VAR-1.png" style="display: block; margin: auto;" />
+<img src="code/stock-portfolio-analysis_files/figure-gfm/VAR-1.png" style="display: block; margin: auto;" />
 
 The last step of the VaR analysis consists in testing the two models on
 portfolio returns of 2010 using a rolling window of 755 days. The first
@@ -2653,7 +2653,7 @@ YES
 
 </table>
 
-<img src="stock-portfolio-analysis_files/figure-gfm/var-backtesting-1.png" style="display: block; margin: auto;" />
+<img src="code/stock-portfolio-analysis_files/figure-gfm/var-backtesting-1.png" style="display: block; margin: auto;" />
 
 <div id="refs" class="references">
 
